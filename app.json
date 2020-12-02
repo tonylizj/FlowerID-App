@@ -1,0 +1,12 @@
+{
+  "name": "FlowerID",
+  "displayName": "FlowerID",
+  "expo": {
+    "name": "FlowerID",
+    "slug": "FlowerID",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
