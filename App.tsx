@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  Dimensions,
 } from "react-native";
 
 import * as tf from "@tensorflow/tfjs";
@@ -69,11 +70,24 @@ const App = () => {
     }
   };
 
+  const cameraStyle = (dHeight: number, dWidth: number) => {
+    return {
+      flex: 0,
+      height: dHeight,
+      width: dWidth,
+    }
+  }
+
   if (setupFinished) {
+    let { height: dHeight, width: dWidth } = Dimensions.get('window');
+    dHeight = (dWidth * 4) / 3;
+
+    console.log(dHeight, dWidth);
+
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'black' }}>
         <Camera
-          style={{ flex: 1 }}
+          style={cameraStyle(dHeight, dWidth)}
           type={type}
           ref={(ref) => {
             setCameraRef(ref);
