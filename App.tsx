@@ -17,6 +17,8 @@ import { Camera, getPermissionsAsync } from "expo-camera";
 import { LayersModel } from "@tensorflow/tfjs";
 import * as Permissions from "expo-permissions";
 
+import styles from "./styles";
+
 const App = () => {
   const [capturing, setCapturing] = useState(false);
   const [TFReady, setTFReady] = useState(false);
@@ -75,17 +77,17 @@ const App = () => {
       flex: 0,
       height: dHeight,
       width: dWidth,
-    }
-  }
+    };
+  };
 
   if (setupFinished) {
-    let { height: dHeight, width: dWidth } = Dimensions.get('window');
+    let { height: dHeight, width: dWidth } = Dimensions.get("window");
     dHeight = (dWidth * 4) / 3;
 
     console.log(dHeight, dWidth);
 
     return (
-      <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'black' }}>
+      <View style={styles.preview}>
         <Camera
           style={cameraStyle(dHeight, dWidth)}
           type={type}
@@ -93,25 +95,9 @@ const App = () => {
             setCameraRef(ref);
           }}
         >
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "transparent",
-              justifyContent: "flex-end",
-            }}
-          >
+          <View style={styles.insideCamera}>
             <TouchableOpacity
-              style={{
-                backgroundColor: "gray",
-                margin: 5,
-                width: 80,
-                height: 50,
-                borderWidth: 5,
-                borderRadius: 10,
-                borderColor: "#FFFFFF",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={styles.flipButton}
               onPress={() => {
                 setType(
                   type === Camera.Constants.Type.back
@@ -120,12 +106,10 @@ const App = () => {
                 );
               }}
             >
-              <Text style={{ fontSize: 18, margin: 10, color: "white" }}>
-                Flip
-              </Text>
+              <Text style={styles.flipText}>Flip</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={{ alignSelf: "center" }}
+              style={styles.picButton}
               onPress={async () => {
                 if (cameraRef) {
                   let photo = await cameraRef.takePictureAsync();
@@ -133,25 +117,7 @@ const App = () => {
                 }
               }}
             >
-              <View
-                style={{
-                  borderWidth: 2,
-                  borderRadius: 1,
-                  backgroundColor: "transparent",
-                  justifyContent: "flex-end",
-                }}
-              >
-                <View
-                  style={{
-                    borderWidth: 2,
-                    borderRadius: 1,
-                    borderColor: "white",
-                    height: 40,
-                    width: 40,
-                    backgroundColor: "white",
-                  }}
-                ></View>
-              </View>
+              <View style={styles.picText}></View>
             </TouchableOpacity>
           </View>
         </Camera>
@@ -222,41 +188,5 @@ const App = () => {
     );
   }
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "column",
-    backgroundColor: "white",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  orangeText: {
-    textAlign: "center",
-    color: "orange",
-    fontSize: 22,
-  },
-  greenText: {
-    textAlign: "center",
-    color: "green",
-    fontSize: 22,
-  },
-  permsButton: {
-    backgroundColor: "gray",
-    margin: 10,
-    width: 150,
-    height: 60,
-    borderWidth: 5,
-    borderRadius: 10,
-    borderColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  preview: {
-    flex: 1,
-    backgroundColor: "transparent",
-    flexDirection: "row",
-  },
-});
 
 export default App;
