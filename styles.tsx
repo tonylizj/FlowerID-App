@@ -4,7 +4,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    backgroundColor: "white",
+    backgroundColor: "black",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -18,16 +18,24 @@ const styles = StyleSheet.create({
     color: "green",
     fontSize: 22,
   },
+  smallGreenText: {
+    textAlign: "center",
+    color: "green",
+    fontSize: 14,
+  },
   permsButton: {
     backgroundColor: "gray",
     margin: 10,
     width: 150,
     height: 60,
-    borderWidth: 5,
+    //borderWidth: 5,
     borderRadius: 10,
     borderColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
+  },
+  permsButtonContainer: {
+    alignItems: "center",
   },
   preview: { flex: 1, justifyContent: "center", backgroundColor: "black" },
   insideCamera: {
