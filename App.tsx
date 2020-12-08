@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Dimensions,
-  ImageBackground,
 } from "react-native";
 
 import * as tf from "@tensorflow/tfjs";
@@ -84,7 +83,6 @@ const App = () => {
     const Buffer = require('buffer').Buffer;
     const jpegData = Buffer.from(rawImageString, 'base64');
     const {width, height, data} = jpeg.decode(jpegData, TO_UINT8ARRAY);
-    // Drop the alpha channel info for mobilenet
     const buffer = new Uint8Array(width * height * 3);
     let offset = 0; // offset into original data
     for (let i = 0; i < buffer.length; i += 3) {
@@ -148,7 +146,7 @@ const App = () => {
         )
       } else {
         getPrediction();
-        return (
+        return ( // this part never actually renders for some reason
           <View>
             <Text>
               predicting
