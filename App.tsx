@@ -24,16 +24,20 @@ import styles from "./styles";
 const App = () => {
   const [TFReady, setTFReady] = useState(false);
   const [modelReady, setModelReady] = useState(false);
-  const [prediction, setPrediction] = useState<any>();
-  const [imageUri, setImageUri] = useState<string>("");
-  const [imageBase64, setImageBase64] = useState<string>("");
-  const [captured, setCaptured] = useState(false);
   const [model, setModel] = useState<LayersModel>();
-  const [predicted, setPredicted] = useState(false);
+
   const [cameraPermission, setCameraPermission] = useState(false);
   const [cameraRef, setCameraRef] = useState<Camera | null>();
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [setupFinished, setSetupFinished] = useState(false);
+
+  const [prediction, setPrediction] = useState<any>();
+  const [imageUri, setImageUri] = useState<string>("");
+  const [imageBase64, setImageBase64] = useState<string>("");
+  const [captured, setCaptured] = useState(false);
+  const [predicted, setPredicted] = useState(false);
+  const [readyForPrediction, setReadyForPrediction] = useState(false);
+
 
   useEffect(() => {
     const initialize = async () => {
@@ -63,6 +67,16 @@ const App = () => {
     initialize();
   }, []);
 
+  useEffect(() => {
+    const getPred = () => {
+      if (captured && readyForPrediction) {
+        getPrediction();
+      }
+    };
+
+    getPred();
+  });
+
   const grantPermissions = async () => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     if (status === "granted") {
@@ -70,7 +84,10 @@ const App = () => {
     }
   };
 
-  const cameraStyle = (dHeight: number, dWidth: number) => {
+  const cameraStyle = () => {
+    let { height: dHeight, width: dWidth } = Dimensions.get("window");
+    dHeight = (dWidth * 4) / 3;
+
     return {
       flex: 0,
       height: dHeight,
@@ -78,7 +95,27 @@ const App = () => {
     };
   };
 
-  const imageToTensor = (rawImageString:string) => {
+  const takePicture = async () => {
+    if (cameraRef) {
+      setReadyForPrediction(false);
+      console.log(0);
+      let { uri } = await cameraRef.takePictureAsync();
+      setCaptured(true);
+      console.log(0.5);
+      const {uri: newUri, base64} = await IM.manipulateAsync(
+        uri,
+        [{resize: {width: 200, height: 200}}],
+        {base64: true},
+      );
+      console.log(1);
+      setImageBase64(base64 as string);
+      setImageUri(newUri);
+      setReadyForPrediction(true);
+      console.log(2);
+    }
+  }
+
+  const imageToTensor =  async (rawImageString:string) => {
     const TO_UINT8ARRAY = true;
     const Buffer = require('buffer').Buffer;
     const jpegData = Buffer.from(rawImageString, 'base64');
@@ -96,8 +133,9 @@ const App = () => {
   }
 
   const getPrediction = async () => {
+    if (!readyForPrediction) return;
     const classes = ['Daisy', 'Dandelion', 'Rose', 'Sunflower', 'Tulip'];
-    var imageTensor = imageToTensor(imageBase64);
+    var imageTensor = await imageToTensor(imageBase64);
     if (model !== undefined) {
       const pred = model.predict(imageTensor) as tf.Tensor;
       const results = pred.dataSync();
@@ -117,14 +155,11 @@ const App = () => {
   }
 
   if (setupFinished) {
-    let { height: dHeight, width: dWidth } = Dimensions.get("window");
-    dHeight = (dWidth * 4) / 3;
-
     if (captured) {
       if (predicted) {
         return (
           <View style={styles.container}>
-            <Image source={{uri: imageUri} }style={{width: 400, height: 400}}/>
+            <Image source={{uri: imageUri}} style={styles.predictionImage}/>
             <Text style={styles.smallGreenText}>
               This is an image of: 
             </Text>
@@ -135,7 +170,6 @@ const App = () => {
               <TouchableOpacity onPress={() => {
                 setPredicted(false);
                 setCaptured(false);
-
               }}>
                 <View style={styles.permsButton}>
                   <Text>Return</Text>
@@ -145,12 +179,9 @@ const App = () => {
           </View>
         )
       } else {
-        getPrediction();
-        return ( // this part never actually renders for some reason
-          <View>
-            <Text>
-              predicting
-            </Text>
+        return (
+          <View style={styles.container}>
+            <Text style={styles.greenText}>Predicting...</Text>
           </View>
         )
       }
@@ -158,7 +189,7 @@ const App = () => {
       return (
         <View style={styles.preview}>
           <Camera
-            style={cameraStyle(dHeight, dWidth)}
+            style={cameraStyle()}
             type={type}
             ref={(ref) => {
               setCameraRef(ref);
@@ -179,19 +210,7 @@ const App = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.picButton}
-                onPress={async () => {
-                  if (cameraRef) {
-                    let { uri } = await cameraRef.takePictureAsync();
-                    setImageUri(uri);
-                    const {base64} = await IM.manipulateAsync(
-                      uri,
-                      [{resize: {width: 200, height: 200}}],
-                      {base64: true},
-                    );
-                    setImageBase64(base64 as string);
-                    setCaptured(true);
-                  }
-                }}
+                onPress={async () => takePicture()}
               >
                 <View style={styles.picText}></View>
               </TouchableOpacity>

@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     width: 80,
     backgroundColor: "white",
   },
+  predictionImage: {width: 400, height: 400},
 });
 
 export default styles;
