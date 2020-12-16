@@ -111,11 +111,10 @@ const App = () => {
     }
   }
 
-  const imageToTensor =  async (rawImageString:string) => {
-    const TO_UINT8ARRAY = true;
+  const imageToTensor = async (rawImageString:string) => {
     const Buffer = require('buffer').Buffer;
     const jpegData = Buffer.from(rawImageString, 'base64');
-    const {width, height, data} = jpeg.decode(jpegData, TO_UINT8ARRAY);
+    const {width, height, data} = jpeg.decode(jpegData);
     const buffer = new Uint8Array(width * height * 3);
     let offset = 0; // offset into original data
     for (let i = 0; i < buffer.length; i += 3) {
