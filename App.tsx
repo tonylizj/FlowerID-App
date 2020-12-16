@@ -98,20 +98,16 @@ const App = () => {
   const takePicture = async () => {
     if (cameraRef) {
       setReadyForPrediction(false);
-      console.log(0);
       let { uri } = await cameraRef.takePictureAsync();
       setCaptured(true);
-      console.log(0.5);
       const {uri: newUri, base64} = await IM.manipulateAsync(
         uri,
         [{resize: {width: 200, height: 200}}],
         {base64: true},
       );
-      console.log(1);
       setImageBase64(base64 as string);
       setImageUri(newUri);
       setReadyForPrediction(true);
-      console.log(2);
     }
   }
 
