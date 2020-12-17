@@ -2,7 +2,7 @@ package com.flowerid;
 
 import android.app.Application;
 import android.content.Context;
-import android.net.Uri;
+//import android.net.Uri;
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
@@ -21,12 +21,12 @@ import org.unimodules.core.interfaces.SingletonModule;
 import expo.modules.constants.ConstantsPackage;
 import expo.modules.permissions.PermissionsPackage;
 import expo.modules.filesystem.FileSystemPackage;
-import expo.modules.updates.UpdatesController;
+//import expo.modules.updates.UpdatesController;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nullable;
+//import javax.annotation.Nullable;
 
 public class MainApplication extends Application implements ReactApplication {
   private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(
@@ -51,6 +51,7 @@ public class MainApplication extends Application implements ReactApplication {
       return "index";
     }
 
+    /*
     @Override
     protected @Nullable String getJSBundleFile() {
       if (BuildConfig.DEBUG) {
@@ -59,7 +60,9 @@ public class MainApplication extends Application implements ReactApplication {
         return UpdatesController.getInstance().getLaunchAssetFile();
       }
     }
+    */
 
+    /*
     @Override
     protected @Nullable String getBundleAssetName() {
       if (BuildConfig.DEBUG) {
@@ -68,6 +71,7 @@ public class MainApplication extends Application implements ReactApplication {
         return UpdatesController.getInstance().getBundleAssetName();
       }
     }
+    */
   };
 
   @Override
@@ -80,9 +84,11 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
 
+    /*
     if (!BuildConfig.DEBUG) {
       UpdatesController.initialize(this);
     }
+    */
 
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
   }
