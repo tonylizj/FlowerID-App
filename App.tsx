@@ -11,7 +11,7 @@ import {
 
 import * as tf from "@tensorflow/tfjs";
 import "@tensorflow/tfjs-react-native";
-import { bundleResourceIO, decodeJpeg } from "@tensorflow/tfjs-react-native";
+import { bundleResourceIO } from "@tensorflow/tfjs-react-native";
 
 import { Camera } from "expo-camera";
 import { LayersModel } from "@tensorflow/tfjs";
@@ -47,19 +47,15 @@ const App = () => {
         setCameraPermission(true);
       }
 
-      const tfState = tf.ready();
+      const tfState = await tf.ready();
+      setTFReady(true);
 
       const modelJSON = require("./assets/model/model.json");
       const modelWeights = require("./assets/model/weights.bin");
-      const modelState = tf.loadLayersModel(
+      const model = await tf.loadLayersModel(
         bundleResourceIO(modelJSON, modelWeights)
       );
 
-      setTFReady(true);
-
-      const [_, model] = await Promise.all([tfState, modelState]);
-
-      model.summary();
       setModel(model);
       setModelReady(true);
     };
@@ -68,18 +64,14 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const getPred = () => {
-      if (captured && readyForPrediction) {
-        getPrediction();
-      }
-    };
-
-    getPred();
-  });
+    if (captured && readyForPrediction) {
+      getPrediction();
+    }
+  }, [captured, readyForPrediction]);
 
   const grantPermissions = async () => {
-    const { status } = await Permissions.askAsync(Permissions.CAMERA);
-    if (status === "granted") {
+    const res = await Permissions.askAsync(Permissions.CAMERA);
+    if (res.status === "granted") {
       setCameraPermission(true);
     }
   };
@@ -97,7 +89,6 @@ const App = () => {
 
   const takePicture = async () => {
     if (cameraRef) {
-      setReadyForPrediction(false);
       let { uri } = await cameraRef.takePictureAsync();
       setCaptured(true);
       const {uri: newUri, base64} = await IM.manipulateAsync(
@@ -111,7 +102,7 @@ const App = () => {
     }
   }
 
-  const imageToTensor = async (rawImageString:string) => {
+  const imageToTensor = async (rawImageString: string) => {
     const Buffer = require('buffer').Buffer;
     const jpegData = Buffer.from(rawImageString, 'base64');
     const {width, height, data} = jpeg.decode(jpegData);
@@ -154,6 +145,7 @@ const App = () => {
       if (predicted) {
         return (
           <View style={styles.container}>
+            <StatusBar style="auto" />
             <Image source={{uri: imageUri}} style={styles.predictionImage}/>
             <Text style={styles.smallGreenText}>
               This is an image of: 
@@ -165,6 +157,7 @@ const App = () => {
               <TouchableOpacity onPress={() => {
                 setPredicted(false);
                 setCaptured(false);
+                setReadyForPrediction(false);
               }}>
                 <View style={styles.permsButton}>
                   <Text>Return</Text>
@@ -176,6 +169,7 @@ const App = () => {
       } else {
         return (
           <View style={styles.container}>
+            <StatusBar style="auto" />
             <Text style={styles.greenText}>Predicting...</Text>
           </View>
         )
@@ -183,6 +177,7 @@ const App = () => {
     } else {
       return (
         <View style={styles.preview}>
+          <StatusBar style="auto" />
           <Camera
             style={cameraStyle()}
             type={type}
@@ -267,11 +262,23 @@ const App = () => {
               Camera permissions have not been granted.
             </Text>
             <View style={styles.permsButtonContainer}>
-              <TouchableOpacity onPress={() => grantPermissions()}>
-                <View style={styles.permsButton}>
-                  <Text>Grant</Text>
-                </View>
-              </TouchableOpacity>
+              {TFReady && modelReady ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    grantPermissions();
+                  }}
+                >
+                  <View style={styles.permsButton}>
+                    <Text>Grant Permissions</Text>
+                  </View>
+                </TouchableOpacity>
+              ) : (
+                <TouchableWithoutFeedback onPress={() => {}}>
+                  <View style={styles.permsButton}>
+                    <Text>Please wait...</Text>
+                  </View>
+                </TouchableWithoutFeedback>
+              )}
             </View>
           </View>
         )}
