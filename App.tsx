@@ -38,6 +38,7 @@ const App = () => {
   const [prediction, setPrediction] = useState<string>();
   const [imageUri, setImageUri] = useState<string>("");
   const [imageBase64, setImageBase64] = useState<string>("");
+  const [capturing, setCapturing] = useState<boolean>(false);
   const [captured, setCaptured] = useState<boolean>(false);
   const [predicted, setPredicted] = useState<boolean>(false);
   const [readyForPrediction, setReadyForPrediction] = useState<boolean>(false);
@@ -58,7 +59,6 @@ const App = () => {
       const model = await tf.loadLayersModel(
         bundleResourceIO(modelJSON, modelWeights)
       );
-
       setModel(model);
       setModelReady(true);
     };
@@ -71,6 +71,12 @@ const App = () => {
       getPrediction();
     }
   }, [captured, readyForPrediction]);
+
+  // useEffect(() => {
+  //   if (TFReady) {
+  //     console.log(tf.memory());
+  //   }
+  // })
 
   const grantPermissions = async (): Promise<void> => {
     const res = await Permissions.askAsync(Permissions.CAMERA);
@@ -95,6 +101,7 @@ const App = () => {
   };
 
   const takePicture = async (): Promise<void> => {
+    setCapturing(true);
     if (cameraRef) {
       let { uri } = await cameraRef.takePictureAsync();
       setCaptured(true);
@@ -106,6 +113,7 @@ const App = () => {
       setImageBase64(base64 as string);
       setImageUri(newUri);
       setReadyForPrediction(true);
+      setCapturing(false);
     }
   };
 
@@ -126,10 +134,17 @@ const App = () => {
     return tf.tensor4d(buffer, [1, width, height, 3]);
   };
 
+  const goBackToCamera = (): void => {
+    setPredicted(false);
+    setCapturing(false);
+    setCaptured(false);
+    setReadyForPrediction(false);
+  }
+
   const getPrediction = async (): Promise<void> => {
     if (!readyForPrediction) return;
     const classes = ["Daisy", "Dandelion", "Rose", "Sunflower", "Tulip"];
-    var imageTensor = await imageToTensor(imageBase64);
+    let imageTensor = await imageToTensor(imageBase64);
     if (model !== undefined) {
       const pred = model.predict(imageTensor) as tf.Tensor;
       const results = pred.dataSync();
@@ -158,13 +173,7 @@ const App = () => {
             <Text style={styles.smallGreenText}>This is an image of:</Text>
             <Text style={styles.greenText}>{prediction}</Text>
             <View style={styles.permsButtonContainer}>
-              <TouchableOpacity
-                onPress={() => {
-                  setPredicted(false);
-                  setCaptured(false);
-                  setReadyForPrediction(false);
-                }}
-              >
+              <TouchableOpacity onPress={() => {goBackToCamera()}}>
                 <View style={styles.permsButton}>
                   <Text>Return</Text>
                 </View>
@@ -192,6 +201,14 @@ const App = () => {
             }}
           >
             <View style={styles.insideCamera}>
+              {capturing ? 
+                  <Text style={styles.orangeText}>
+                    Waiting on camera to take picture...
+                  </Text>
+                : 
+                  <Text></Text>
+              }
+              
               <TouchableOpacity
                 style={styles.flipButton}
                 onPress={() => {
