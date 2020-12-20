@@ -139,7 +139,7 @@ const App = () => {
     setCapturing(false);
     setCaptured(false);
     setReadyForPrediction(false);
-  }
+  };
 
   const getPrediction = async (): Promise<void> => {
     if (!readyForPrediction) return;
@@ -173,7 +173,11 @@ const App = () => {
             <Text style={styles.smallGreenText}>This is an image of:</Text>
             <Text style={styles.greenText}>{prediction}</Text>
             <View style={styles.permsButtonContainer}>
-              <TouchableOpacity onPress={() => {goBackToCamera()}}>
+              <TouchableOpacity
+                onPress={() => {
+                  goBackToCamera();
+                }}
+              >
                 <View style={styles.permsButton}>
                   <Text>Return</Text>
                 </View>
@@ -201,14 +205,15 @@ const App = () => {
             }}
           >
             <View style={styles.insideCamera}>
-              {capturing ? 
-                  <Text style={styles.orangeText}>
-                    Waiting on camera to take picture...
-                  </Text>
-                : 
-                  <Text></Text>
-              }
-              
+              {capturing ? (
+                <Text style={styles.orangeText}>
+                  Waiting on camera to take picture...
+                </Text>
+              ) : (
+                <Text></Text>
+              )}
+            </View>
+            <View>
               <TouchableOpacity
                 style={styles.flipButton}
                 onPress={() => {
@@ -225,7 +230,7 @@ const App = () => {
                 style={styles.picButton}
                 onPress={async () => takePicture()}
               >
-                <View style={styles.picText}></View>
+                <Text style={styles.flipText}>Submit Picture</Text>
               </TouchableOpacity>
             </View>
           </Camera>

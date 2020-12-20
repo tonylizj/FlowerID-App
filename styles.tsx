@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "column",
+    //flexDirection: "column",
     backgroundColor: "black",
     alignItems: "center",
     justifyContent: "center",
@@ -28,7 +28,6 @@ const styles = StyleSheet.create({
     margin: 10,
     width: 150,
     height: 60,
-    //borderWidth: 5,
     borderRadius: 10,
     borderColor: "#FFFFFF",
     alignItems: "center",
@@ -44,25 +43,29 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   flipButton: {
+    position: "absolute",
     backgroundColor: "white",
     margin: 0,
-    width: 50,
-    height: 30,
+    width: 60,
+    height: 60,
+    zIndex: 1,
     borderRadius: 10,
     borderColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
   },
-  flipText: { fontSize: 12, color: "black" },
-  picButton: { alignSelf: "center" },
-  picText: {
-    borderWidth: 2,
+  flipText: { fontSize: 14, color: "black" },
+  picButton: {
+    position: "absolute",
+    alignSelf: "center",
     borderRadius: 10,
     height: 60,
     width: 150,
     backgroundColor: "white",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  predictionImage: {width: 400, height: 400},
+  predictionImage: { width: 400, height: 400 },
 });
 
 export default styles;
