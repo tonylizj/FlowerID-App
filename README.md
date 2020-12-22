@@ -6,3 +6,13 @@ Google Play Link: https://play.google.com/store/apps/details?id=com.flowerid
 
 Dataset Source:
 https://www.kaggle.com/alxmamaev/flowers-recognition
+
+To build:
+```
+// set up your signing keystore if building for production
+npm install
+
+// debug build
+npm android
+// production build
+npm android-release
