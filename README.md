@@ -13,6 +13,6 @@ To build:
 npm install
 
 // debug build
-npm android
+npm run android
 // production build
-npm android-release
+npm run android-release
