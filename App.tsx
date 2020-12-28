@@ -157,7 +157,8 @@ const App = () => {
       setPrediction(classes[currMaxIndex]);
       setPredicted(true);
     } else {
-      throw new Error('model is undefined');
+      setPrediction('Error: model is undefined at prediction stage.');
+      setPredicted(true);
     }
   };
 
