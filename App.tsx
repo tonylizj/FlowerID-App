@@ -1,7 +1,5 @@
-/* eslint-disable react/jsx-filename-extension */
-import { StatusBar } from 'expo-status-bar';
-// eslint-disable-next-line no-use-before-define
-import React, { useState, useEffect } from 'react';
+import { StatusBar } from "expo-status-bar";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -10,20 +8,21 @@ import {
   TouchableWithoutFeedback,
   Dimensions,
   Alert,
-} from 'react-native';
+} from "react-native";
 
-import * as tf from '@tensorflow/tfjs';
-import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
+import * as tf from "@tensorflow/tfjs";
+import "@tensorflow/tfjs-react-native";
+import { bundleResourceIO } from "@tensorflow/tfjs-react-native";
 
-import { Camera } from 'expo-camera';
-import { LayersModel } from '@tensorflow/tfjs';
-import * as Permissions from 'expo-permissions';
-import * as jpeg from 'jpeg-js';
-import * as IM from 'expo-image-manipulator';
+import { Camera } from "expo-camera";
+import { LayersModel } from "@tensorflow/tfjs";
+import * as Permissions from "expo-permissions";
+import * as jpeg from "jpeg-js";
+import * as IM from "expo-image-manipulator";
 
-import styles from './styles'; // eslint-disable-line
+import styles from "./styles";
 
-import aboutFIDText from './assets/aboutFID'; // eslint-disable-line
+import aboutFIDText from "./assets/aboutFID";
 
 const App = () => {
   const [TFReady, setTFReady] = useState<boolean>(false);
@@ -37,8 +36,8 @@ const App = () => {
   const [type, setType] = useState<string>(Camera.Constants.Type.back);
 
   const [prediction, setPrediction] = useState<string>();
-  const [imageUri, setImageUri] = useState<string>('');
-  const [imageBase64, setImageBase64] = useState<string>('');
+  const [imageUri, setImageUri] = useState<string>("");
+  const [imageBase64, setImageBase64] = useState<string>("");
   const [capturing, setCapturing] = useState<boolean>(false);
   const [captured, setCaptured] = useState<boolean>(false);
   const [predicted, setPredicted] = useState<boolean>(false);
@@ -47,7 +46,7 @@ const App = () => {
   useEffect(() => {
     const initialize = async () => {
       if (
-        (await Permissions.getAsync(Permissions.CAMERA)).status === 'granted'
+        (await Permissions.getAsync(Permissions.CAMERA)).status === "granted"
       ) {
         setCameraPermission(true);
       }
@@ -55,14 +54,12 @@ const App = () => {
       await tf.ready();
       setTFReady(true);
 
-      // eslint-disable-next-line global-require
-      const modelJSON = require('./assets/model/model.json');
-      // eslint-disable-next-line global-require
-      const modelWeights = require('./assets/model/weights.bin');
-      const loadedModel = await tf.loadLayersModel(
-        bundleResourceIO(modelJSON, modelWeights),
+      const modelJSON = require("./assets/model/model.json");
+      const modelWeights = require("./assets/model/weights.bin");
+      const model = await tf.loadLayersModel(
+        bundleResourceIO(modelJSON, modelWeights)
       );
-      setModel(loadedModel);
+      setModel(model);
       setModelReady(true);
     };
 
@@ -71,7 +68,6 @@ const App = () => {
 
   useEffect(() => {
     if (captured && readyForPrediction) {
-      // eslint-disable-next-line no-use-before-define
       getPrediction();
     }
   }, [captured, readyForPrediction]);
@@ -84,34 +80,35 @@ const App = () => {
 
   const grantPermissions = async (): Promise<void> => {
     const res = await Permissions.askAsync(Permissions.CAMERA);
-    if (res.status === 'granted') {
+    if (res.status === "granted") {
       setCameraPermission(true);
     }
   };
 
   const cameraStyle = (): Object => {
-    const { width: dWidth } = Dimensions.get('window');
+    let { height: dHeight, width: dWidth } = Dimensions.get("window");
+    dHeight = (dWidth * 4) / 3;
 
     return {
       flex: 0,
-      height: (dWidth * 4) / 3,
+      height: dHeight,
       width: dWidth,
     };
   };
 
   const aboutFID = async () => {
-    Alert.alert('About FlowerID', aboutFIDText, [{ text: 'OK' }]);
+    Alert.alert("About FlowerID", aboutFIDText, [{ text: "OK" }]);
   };
 
   const takePicture = async (): Promise<void> => {
     setCapturing(true);
     if (cameraRef) {
-      const { uri } = await cameraRef.takePictureAsync();
+      let { uri } = await cameraRef.takePictureAsync();
       setCaptured(true);
       const { uri: newUri, base64 } = await IM.manipulateAsync(
         uri,
         [{ resize: { width: 200, height: 200 } }],
-        { base64: true },
+        { base64: true }
       );
       setImageBase64(base64 as string);
       setImageUri(newUri);
@@ -121,9 +118,9 @@ const App = () => {
   };
 
   const imageToTensor = async (
-    rawImageString: string,
+    rawImageString: string
   ): Promise<tf.Tensor4D> => {
-    const jpegData = Buffer.from(rawImageString, 'base64');
+    const jpegData = Buffer.from(rawImageString, "base64");
     const { width, height, data } = jpeg.decode(jpegData);
     const buffer = new Uint8Array(width * height * 3);
     let offset = 0; // offset into original data
@@ -146,14 +143,14 @@ const App = () => {
 
   const getPrediction = async (): Promise<void> => {
     if (!readyForPrediction) return;
-    const classes = ['Daisy', 'Dandelion', 'Rose', 'Sunflower', 'Tulip'];
-    const imageTensor = await imageToTensor(imageBase64);
+    const classes = ["Daisy", "Dandelion", "Rose", "Sunflower", "Tulip"];
+    let imageTensor = await imageToTensor(imageBase64);
     if (model !== undefined) {
       const pred = model.predict(imageTensor) as tf.Tensor;
       const results = pred.dataSync();
       let currMaxIndex = 0;
       let currMax = -1;
-      for (let i = 0; i < results.length; i += 1) {
+      for (let i = 0; i < results.length; ++i) {
         if (results[i] >= currMax) {
           currMax = results[i];
           currMaxIndex = i;
@@ -162,8 +159,7 @@ const App = () => {
       setPrediction(classes[currMaxIndex]);
       setPredicted(true);
     } else {
-      setPrediction('Error: model was undefined at predictions stage.');
-      setPredicted(true);
+      throw new Error("model is undefined");
     }
   };
 
@@ -172,7 +168,6 @@ const App = () => {
       if (predicted) {
         return (
           <View style={styles.container}>
-            {/* eslint-disable-next-line react/style-prop-object */}
             <StatusBar style="auto" />
             <Image source={{ uri: imageUri }} style={styles.predictionImage} />
             <Text style={styles.smallGreenText}>This is an image of:</Text>
@@ -190,147 +185,147 @@ const App = () => {
             </View>
           </View>
         );
+      } else {
+        return (
+          <View style={styles.container}>
+            <StatusBar style="auto" />
+            <Text style={styles.orangeText}>Predicting...</Text>
+          </View>
+        );
       }
+    } else {
       return (
-        <View style={styles.container}>
-          {/* eslint-disable-next-line react/style-prop-object */}
+        <View style={styles.preview}>
           <StatusBar style="auto" />
-          <Text style={styles.orangeText}>Predicting...</Text>
+          <Camera
+            style={cameraStyle()}
+            type={type}
+            ref={(ref) => {
+              setCameraRef(ref);
+            }}
+          >
+            <View style={styles.insideCamera}>
+              {capturing ? (
+                <Text style={styles.orangeText}>
+                  Waiting on camera to take picture...
+                </Text>
+              ) : (
+                <Text></Text>
+              )}
+            </View>
+            <View>
+              <TouchableOpacity
+                style={styles.flipButton}
+                onPress={() => {
+                  setType(
+                    type === Camera.Constants.Type.back
+                      ? Camera.Constants.Type.front
+                      : Camera.Constants.Type.back
+                  );
+                }}
+              >
+                <Text style={styles.flipText}>Flip</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.picButton}
+                onPress={async () => takePicture()}
+              >
+                <Text style={styles.flipText}>Submit Picture</Text>
+              </TouchableOpacity>
+            </View>
+          </Camera>
         </View>
       );
     }
+  } else {
     return (
-      <View style={styles.preview}>
-        {/* eslint-disable-next-line react/style-prop-object */}
+      <View style={styles.container}>
         <StatusBar style="auto" />
-        <Camera
-          style={cameraStyle()}
-          type={type}
-          ref={(ref) => {
-            setCameraRef(ref);
-          }}
-        >
-          <View style={styles.insideCamera}>
-            {capturing ? (
-              <Text style={styles.orangeText}>
-                Waiting on camera to take picture...
-              </Text>
-            ) : (
-              <Text />
-            )}
-          </View>
+        {TFReady ? (
+          <Text style={styles.greenText}>
+            TensorFlow has loaded successfully.
+          </Text>
+        ) : (
+          <Text style={styles.orangeText}>
+            Waiting on TensorFlow to load...
+          </Text>
+        )}
+        {modelReady ? (
+          <Text style={styles.greenText}>
+            FlowerID model has loaded successfully.
+          </Text>
+        ) : (
+          <Text style={styles.orangeText}>
+            Waiting on FlowerID model to load...
+          </Text>
+        )}
+        {cameraPermission ? (
           <View>
-            <TouchableOpacity
-              style={styles.flipButton}
-              onPress={() => {
-                setType(
-                  type === Camera.Constants.Type.back
-                    ? Camera.Constants.Type.front
-                    : Camera.Constants.Type.back,
-                );
-              }}
-            >
-              <Text style={styles.flipText}>Flip</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.picButton}
-              onPress={async () => takePicture()}
-            >
-              <Text style={styles.flipText}>Submit Picture</Text>
-            </TouchableOpacity>
+            <Text style={styles.greenText}>
+              Camera permissions have been granted.
+            </Text>
+            <View style={styles.permsButtonContainer}>
+              {TFReady && modelReady ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSetupFinished(true);
+                  }}
+                >
+                  <View style={styles.permsButton}>
+                    <Text>Start FlowerID</Text>
+                  </View>
+                </TouchableOpacity>
+              ) : (
+                <TouchableWithoutFeedback onPress={() => {}}>
+                  <View style={styles.permsButton}>
+                    <Text>Please wait...</Text>
+                  </View>
+                </TouchableWithoutFeedback>
+              )}
+            </View>
           </View>
-        </Camera>
+        ) : (
+          <View>
+            <Text style={styles.orangeText}>
+              Camera permissions have not been granted.
+            </Text>
+            <View style={styles.permsButtonContainer}>
+              {TFReady && modelReady ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    grantPermissions();
+                  }}
+                >
+                  <View style={styles.permsButton}>
+                    <Text>Grant Permissions</Text>
+                  </View>
+                </TouchableOpacity>
+              ) : (
+                <TouchableWithoutFeedback onPress={() => {}}>
+                  <View style={styles.permsButton}>
+                    <Text>Please wait...</Text>
+                  </View>
+                </TouchableWithoutFeedback>
+              )}
+            </View>
+          </View>
+        )}
+        <TouchableOpacity onPress={() => aboutFID()}>
+          <View
+            style={[
+              styles.permsButton,
+              {
+                display:
+                  TFReady && modelReady && cameraPermission ? "flex" : "none",
+              },
+            ]}
+          >
+            <Text>About FlowerID</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     );
   }
-  return (
-    <View style={styles.container}>
-      {/* eslint-disable-next-line react/style-prop-object */}
-      <StatusBar style="auto" />
-      {TFReady ? (
-        <Text style={styles.greenText}>
-          TensorFlow has loaded successfully.
-        </Text>
-      ) : (
-        <Text style={styles.orangeText}>
-          Waiting on TensorFlow to load...
-        </Text>
-      )}
-      {modelReady ? (
-        <Text style={styles.greenText}>
-          FlowerID model has loaded successfully.
-        </Text>
-      ) : (
-        <Text style={styles.orangeText}>
-          Waiting on FlowerID model to load...
-        </Text>
-      )}
-      {cameraPermission ? (
-        <View>
-          <Text style={styles.greenText}>
-            Camera permissions have been granted.
-          </Text>
-          <View style={styles.permsButtonContainer}>
-            {TFReady && modelReady ? (
-              <TouchableOpacity
-                onPress={() => {
-                  setSetupFinished(true);
-                }}
-              >
-                <View style={styles.permsButton}>
-                  <Text>Start FlowerID</Text>
-                </View>
-              </TouchableOpacity>
-            ) : (
-              <TouchableWithoutFeedback onPress={() => {}}>
-                <View style={styles.permsButton}>
-                  <Text>Please wait...</Text>
-                </View>
-              </TouchableWithoutFeedback>
-            )}
-          </View>
-        </View>
-      ) : (
-        <View>
-          <Text style={styles.orangeText}>
-            Camera permissions have not been granted.
-          </Text>
-          <View style={styles.permsButtonContainer}>
-            {TFReady && modelReady ? (
-              <TouchableOpacity
-                onPress={() => {
-                  grantPermissions();
-                }}
-              >
-                <View style={styles.permsButton}>
-                  <Text>Grant Permissions</Text>
-                </View>
-              </TouchableOpacity>
-            ) : (
-              <TouchableWithoutFeedback onPress={() => {}}>
-                <View style={styles.permsButton}>
-                  <Text>Please wait...</Text>
-                </View>
-              </TouchableWithoutFeedback>
-            )}
-          </View>
-        </View>
-      )}
-      <TouchableOpacity onPress={() => aboutFID()}>
-        <View
-          style={[
-            styles.permsButton,
-            {
-              display:
-                  TFReady && modelReady && cameraPermission ? 'flex' : 'none',
-            },
-          ]}
-        >
-          <Text>About FlowerID</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
-  );
 };
 
 export default App;
