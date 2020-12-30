@@ -2,11 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   Text,
   View,
-  Image,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Dimensions,
-  Alert,
 } from 'react-native';
 
 import { LayersModel } from '@tensorflow/tfjs';

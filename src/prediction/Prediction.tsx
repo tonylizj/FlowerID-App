@@ -4,9 +4,6 @@ import {
   View,
   Image,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  Dimensions,
-  Alert,
 } from 'react-native';
 
 import { LayersModel } from '@tensorflow/tfjs';
