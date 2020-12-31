@@ -18,8 +18,6 @@ The initial release used Javascript, but we switched to using Typescript because
 Thanks for downloading FlowerID!
 
 Our GitHubs: https://github.com/tonylizj and https://github.com/danielsqli
-
-Also depending on when you're reading this, the code might be really poorly modularized, with everything in 1 file. We're working on changing this soon.
 `;
 
 export default text;
