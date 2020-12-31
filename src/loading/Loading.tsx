@@ -24,6 +24,8 @@ interface LoadingPageProps {
 }
 
 const LoadingPage = (props: LoadingPageProps) => {
+  const { setModel, setSetupFinished, setMode } = props;
+
   const [TFReady, setTFReady] = useState<boolean>(false);
   const [modelReady, setModelReady] = useState<boolean>(false);
   const [cameraPermission, setCameraPermission] = useState<boolean>(false);
@@ -32,7 +34,7 @@ const LoadingPage = (props: LoadingPageProps) => {
     const res = await Permissions.askAsync(Permissions.CAMERA);
     if (res.status === 'granted') {
       setCameraPermission(true);
-      props.setSetupFinished(true);
+      setSetupFinished(true);
     }
   };
 
@@ -45,25 +47,15 @@ const LoadingPage = (props: LoadingPageProps) => {
       }
       await tf.ready();
       setTFReady(true);
+      const modelJSON = require('../../assets/model/model.json'); // eslint-disable-line
+      const modelWeights = require('../../assets/model/weights.bin'); // eslint-disable-line
+      const loadedModel = await tf.loadLayersModel(bundleResourceIO(modelJSON, modelWeights));
+      setModel(loadedModel);
+      setModelReady(true);
     };
 
     init();
   }, []);
-
-  useEffect(() => {
-    const loadModel = async () => {
-      const modelJSON = require('../../assets/model/model.json'); // eslint-disable-line
-      const modelWeights = require('../../assets/model/weights.bin'); // eslint-disable-line
-      const loadedModel = await tf.loadLayersModel(bundleResourceIO(modelJSON, modelWeights));
-      props.setModel(loadedModel);
-      setModelReady(true);
-    };
-
-    if (tf.ready()) {
-      setTFReady(true);
-      loadModel();
-    }
-  }, [TFReady]);
 
   return (
     <>
@@ -96,7 +88,7 @@ const LoadingPage = (props: LoadingPageProps) => {
             {TFReady && modelReady ? (
               <TouchableOpacity
                 onPress={() => {
-                  props.setMode('camera');
+                  setMode('camera');
                 }}
               >
                 <View style={styles.permsButton}>
