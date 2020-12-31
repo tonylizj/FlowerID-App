@@ -1,25 +1,18 @@
 /* eslint-disable react/jsx-filename-extension */
-import { StatusBar } from 'expo-status-bar';
 // eslint-disable-next-line no-use-before-define
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
-  Text,
   View,
-  Image,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Dimensions,
-  Alert,
 } from 'react-native';
 
 import { LayersModel } from '@tensorflow/tfjs';
 
 import styles from './styles'; // eslint-disable-line
 
-import Loading from './loading/Loading';
-import About from './loading/About';
-import CameraPage from './camera/Camera';
-import Prediction from './prediction/Prediction';
+import LoadingPage from './loading/Loading'; // eslint-disable-line
+import AboutPage from './loading/About'; // eslint-disable-line
+import CameraPage from './camera/Camera'; // eslint-disable-line
+import PredictionPage from './prediction/Prediction'; // eslint-disable-line
 
 const App = () => {
   const [mode, setMode] = useState<string>('loading');
@@ -30,24 +23,30 @@ const App = () => {
   const [imageUri, setImageUri] = useState<string>('');
   const [imageBase64, setImageBase64] = useState<string>('');
 
-  if (mode == 'loading') {
+  if (mode === 'loading') {
     return (
       <View style={styles.container}>
-        <Loading setModel={setModel} setSetupFinished={setSetupFinished} setMode={setMode}/>
-        <About setupFinished={setupFinished}/>
+        <LoadingPage setModel={setModel} setSetupFinished={setSetupFinished} setMode={setMode} />
+        <AboutPage setupFinished={setupFinished} />
       </View>
     );
   }
-  else if (mode == 'camera') {
+  if (mode === 'camera') {
     return (
-      <CameraPage setImageBase64={setImageBase64} setImageUri={setImageUri} setMode={setMode} /> 
+      <CameraPage setImageBase64={setImageBase64} setImageUri={setImageUri} setMode={setMode} />
     );
   }
-  else if (mode == 'prediction') {
+  if (mode === 'prediction') {
     return (
-      <Prediction model={model as LayersModel} imageBase64={imageBase64} imageUri={imageUri} setMode={setMode} />
+      <PredictionPage
+        model={model as LayersModel}
+        imageBase64={imageBase64}
+        imageUri={imageUri}
+        setMode={setMode}
+      />
     );
   }
+  return null;
 };
 
 export default App;

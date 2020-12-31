@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-filename-extension */
+// eslint-disable-next-line no-use-before-define
 import React from 'react';
 import {
   Text,
@@ -13,7 +15,12 @@ const aboutFID = async () => {
   Alert.alert('About FlowerID', aboutFIDText, [{ text: 'OK' }]);
 };
 
-const About = (props: {setupFinished: boolean}) => {
+interface AboutPageProps {
+  setupFinished: boolean;
+}
+
+const AboutPage = (props: AboutPageProps) => {
+  const { setupFinished } = props;
   return (
     <TouchableOpacity onPress={() => aboutFID()}>
       <View
@@ -21,7 +28,7 @@ const About = (props: {setupFinished: boolean}) => {
           styles.permsButton,
           {
             display:
-                props.setupFinished ? 'flex' : 'none',
+                setupFinished ? 'flex' : 'none',
           },
         ]}
       >
@@ -31,4 +38,4 @@ const About = (props: {setupFinished: boolean}) => {
   );
 };
 
-export default About;
+export default AboutPage;

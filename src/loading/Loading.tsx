@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-filename-extension */
+// eslint-disable-next-line no-use-before-define
 import React, { useState, useEffect } from 'react';
 import {
   Text,
@@ -15,7 +17,13 @@ import * as Permissions from 'expo-permissions'; // eslint-disable-line
 
 import styles from '../styles'; // eslint-disable-line
 
-const Loading = (props: {setModel: (model: LayersModel) => void, setSetupFinished: (finished: boolean) => void, setMode: (mode: string) => void}) => {
+interface LoadingPageProps {
+  setModel: (model: LayersModel) => void; // eslint-disable-line
+  setSetupFinished: (finished: boolean) => void; // eslint-disable-line
+  setMode: (mode: string) => void; // eslint-disable-line
+}
+
+const LoadingPage = (props: LoadingPageProps) => {
   const [TFReady, setTFReady] = useState<boolean>(false);
   const [modelReady, setModelReady] = useState<boolean>(false);
   const [cameraPermission, setCameraPermission] = useState<boolean>(false);
@@ -32,10 +40,10 @@ const Loading = (props: {setModel: (model: LayersModel) => void, setSetupFinishe
     const init = async () => {
       await tf.ready();
       setTFReady(true);
-    }
+    };
 
     init();
-  }, [])
+  }, []);
 
   useEffect(() => {
     const loadModel = async () => {
@@ -44,7 +52,7 @@ const Loading = (props: {setModel: (model: LayersModel) => void, setSetupFinishe
       const loadedModel = await tf.loadLayersModel(bundleResourceIO(modelJSON, modelWeights));
       props.setModel(loadedModel);
       setModelReady(true);
-    }
+    };
 
     if (tf.ready()) {
       setTFReady(true);
@@ -129,4 +137,4 @@ const Loading = (props: {setModel: (model: LayersModel) => void, setSetupFinishe
   );
 };
 
-export default Loading;
+export default LoadingPage;

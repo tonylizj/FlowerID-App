@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-filename-extension */
+// eslint-disable-next-line no-use-before-define
 import React, { useState, useEffect } from 'react';
 import {
   Text,
@@ -15,13 +17,27 @@ import { StatusBar } from 'expo-status-bar';
 
 import styles from '../styles'; // eslint-disable-line
 
-const Prediction = (props: {model: LayersModel, imageBase64: string, imageUri: string, setMode: (mode: string) => void}) => {
+interface PredictionPageProps {
+  model: LayersModel;
+  imageBase64: string;
+  imageUri: string;
+  setMode: (mode: string) => void; // eslint-disable-line
+}
+
+const PredictionPage = (props: PredictionPageProps) => {
+  const {
+    model,
+    imageBase64,
+    imageUri,
+    setMode,
+  } = props;
+
   const [predicted, setPredicted] = useState<boolean>(false);
-  const [prediction, setPrediction] = useState<string>();
+  const [prediction, setPrediction] = useState<string>('');
 
   useEffect(() => {
-    getPrediction();
-  }, [])
+    getPrediction(); // eslint-disable-line
+  }, []);
 
   const imageToTensor = async (rawImageString: string): Promise<tf.Tensor4D> => {
     const jpegData = Buffer.from(rawImageString, 'base64');
@@ -40,9 +56,9 @@ const Prediction = (props: {model: LayersModel, imageBase64: string, imageUri: s
 
   const getPrediction = async (): Promise<void> => {
     const classes = ['Daisy', 'Dandelion', 'Rose', 'Sunflower', 'Tulip'];
-    const imageTensor = await imageToTensor(props.imageBase64);
-    if (props.model !== undefined) {
-      const pred = props.model.predict(imageTensor) as tf.Tensor;
+    const imageTensor = await imageToTensor(imageBase64);
+    if (model !== undefined) {
+      const pred = model.predict(imageTensor) as tf.Tensor;
       const results = pred.dataSync();
       let currMaxIndex = 0;
       let currMax = -1;
@@ -62,34 +78,36 @@ const Prediction = (props: {model: LayersModel, imageBase64: string, imageUri: s
 
   return (
     <View style={styles.container}>
-      {predicted ? 
-      <View>
-        {/* eslint-disable-next-line react/style-prop-object */}
-        <StatusBar style="auto" />
-        <Image source={{ uri: props.imageUri }} style={styles.predictionImage} />
-        <Text style={styles.smallGreenText}>This is an image of:</Text>
-        <Text style={styles.greenText}>{prediction}</Text>
-        <View style={styles.permsButtonContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              props.setMode('camera');
-            }}
-          >
-            <View style={styles.permsButton}>
-              <Text>Return</Text>
+      {predicted
+        ? (
+          <View>
+            {/* eslint-disable-next-line react/style-prop-object */}
+            <StatusBar style="auto" />
+            <Image source={{ uri: imageUri }} style={styles.predictionImage} />
+            <Text style={styles.smallGreenText}>This is an image of:</Text>
+            <Text style={styles.greenText}>{prediction}</Text>
+            <View style={styles.permsButtonContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  setMode('camera');
+                }}
+              >
+                <View style={styles.permsButton}>
+                  <Text>Return</Text>
+                </View>
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
-        </View>
-      </View>
-      :
-      <View>
-        {/* eslint-disable-next-line react/style-prop-object */}
-        <StatusBar style="auto" />
-        <Text style={styles.orangeText}>Predicting...</Text>
-      </View>
-      }
+          </View>
+        )
+        : (
+          <View>
+            {/* eslint-disable-next-line react/style-prop-object */}
+            <StatusBar style="auto" />
+            <Text style={styles.orangeText}>Predicting...</Text>
+          </View>
+        )}
     </View>
   );
-}
+};
 
-export default Prediction;
+export default PredictionPage;
