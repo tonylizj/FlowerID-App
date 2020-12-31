@@ -21,14 +21,15 @@ const App = () => {
   const [setupFinished, setSetupFinished] = useState<boolean>(false);
 
   const [imageUri, setImageUri] = useState<string>('');
-  const [imageBase64, setImageBase64] = useState<string>('');
-
-  const [readyForPrediction, setReadyForPrediction] = useState<boolean>(false);
 
   if (mode === 'loading') {
     return (
       <View style={styles.container}>
-        <LoadingPage setModel={setModel} setSetupFinished={setSetupFinished} setMode={setMode} />
+        <LoadingPage
+          setModel={setModel}
+          setSetupFinished={setSetupFinished}
+          setMode={setMode}
+        />
         <AboutPage setupFinished={setupFinished} />
       </View>
     );
@@ -36,10 +37,8 @@ const App = () => {
   if (mode === 'camera') {
     return (
       <CameraPage
-        setImageBase64={setImageBase64}
         setImageUri={setImageUri}
         setMode={setMode}
-        setReadyForPrediction={setReadyForPrediction}
       />
     );
   }
@@ -47,10 +46,8 @@ const App = () => {
     return (
       <PredictionPage
         model={model as LayersModel}
-        imageBase64={imageBase64}
         imageUri={imageUri}
         setMode={setMode}
-        readyForPrediction={readyForPrediction}
       />
     );
   }

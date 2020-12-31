@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-filename-extension */
 // eslint-disable-next-line no-use-before-define
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Text,
   View,
@@ -12,33 +12,24 @@ import {
 
 import styles from '../styles'; // eslint-disable-line
 
-import * as IM from 'expo-image-manipulator';
 import { StatusBar } from 'expo-status-bar';
 import { Camera } from 'expo-camera';
 
 interface CameraPageProps {
-  setImageBase64: (img: string) => void; // eslint-disable-line
   setImageUri: (uri: string) => void; // eslint-disable-line
   setMode: (mode: string) => void; // eslint-disable-line
-  setReadyForPrediction: (status: boolean) => void; // eslint-disable-line
 }
 
 const CameraPage = (props: CameraPageProps) => {
   const {
-    setImageBase64,
     setImageUri,
     setMode,
-    setReadyForPrediction,
   } = props;
 
   const [capturing, setCapturing] = useState<boolean>(false);
   const [cameraRef, setCameraRef] = useState<Camera | null>();
   const [type, setType] = useState<string>(Camera.Constants.Type.back);
   const [flash, setFlash] = useState<string>(Camera.Constants.FlashMode.off);
-
-  useEffect(() => {
-    setReadyForPrediction(false);
-  }, []);
 
   const cameraStyle = (): StyleProp<ViewStyle> => {
     const { width: dWidth } = Dimensions.get('window');
@@ -54,16 +45,9 @@ const CameraPage = (props: CameraPageProps) => {
     setCapturing(true);
     if (cameraRef) {
       const { uri } = await cameraRef.takePictureAsync();
+      setImageUri(uri);
       setCapturing(false);
       setMode('prediction');
-      const { uri: newUri, base64 } = await IM.manipulateAsync(
-        uri,
-        [{ resize: { width: 200, height: 200 } }],
-        { base64: true },
-      );
-      setImageBase64(base64 as string);
-      setImageUri(newUri);
-      setReadyForPrediction(true);
     }
   };
 

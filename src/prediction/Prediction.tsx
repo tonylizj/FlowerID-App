@@ -14,34 +14,25 @@ import * as tf from '@tensorflow/tfjs';
 import * as jpeg from 'jpeg-js';
 
 import { StatusBar } from 'expo-status-bar';
+import * as IM from 'expo-image-manipulator';
 
 import styles from '../styles'; // eslint-disable-line
 
 interface PredictionPageProps {
   model: LayersModel;
-  imageBase64: string;
   imageUri: string;
   setMode: (mode: string) => void; // eslint-disable-line
-  readyForPrediction: boolean;
 }
 
 const PredictionPage = (props: PredictionPageProps) => {
   const {
     model,
-    imageBase64,
     imageUri,
     setMode,
-    readyForPrediction,
   } = props;
 
   const [predicted, setPredicted] = useState<boolean>(false);
   const [prediction, setPrediction] = useState<string>('');
-
-  useEffect(() => {
-    if (readyForPrediction) {
-      getPrediction(); // eslint-disable-line
-    }
-  }, [readyForPrediction]);
 
   const imageToTensor = async (rawImageString: string): Promise<tf.Tensor4D> => {
     const jpegData = Buffer.from(rawImageString, 'base64');
@@ -58,8 +49,9 @@ const PredictionPage = (props: PredictionPageProps) => {
     return tf.tensor4d(buffer, [1, width, height, 3]);
   };
 
-  const getPrediction = async (): Promise<void> => {
+  const getPrediction = async (imageBase64: string): Promise<void> => {
     const classes = ['Daisy', 'Dandelion', 'Rose', 'Sunflower', 'Tulip'];
+    console.log(imageBase64);
     const imageTensor = await imageToTensor(imageBase64);
     if (model !== undefined) {
       const pred = model.predict(imageTensor) as tf.Tensor;
@@ -79,6 +71,18 @@ const PredictionPage = (props: PredictionPageProps) => {
       setPredicted(true);
     }
   };
+
+  useEffect(() => {
+    const prepareImage = async () => {
+      const { base64 } = await IM.manipulateAsync(
+        imageUri,
+        [{ resize: { width: 200, height: 200 } }],
+        { base64: true },
+      );
+      getPrediction(base64 as string);
+    };
+    prepareImage();
+  }, []);
 
   return (
     <View style={styles.container}>
