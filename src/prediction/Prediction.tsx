@@ -22,6 +22,7 @@ interface PredictionPageProps {
   imageBase64: string;
   imageUri: string;
   setMode: (mode: string) => void; // eslint-disable-line
+  readyForPrediction: boolean;
 }
 
 const PredictionPage = (props: PredictionPageProps) => {
@@ -30,14 +31,17 @@ const PredictionPage = (props: PredictionPageProps) => {
     imageBase64,
     imageUri,
     setMode,
+    readyForPrediction,
   } = props;
 
   const [predicted, setPredicted] = useState<boolean>(false);
   const [prediction, setPrediction] = useState<string>('');
 
   useEffect(() => {
-    getPrediction(); // eslint-disable-line
-  }, []);
+    if (readyForPrediction) {
+      getPrediction(); // eslint-disable-line
+    }
+  }, [readyForPrediction]);
 
   const imageToTensor = async (rawImageString: string): Promise<tf.Tensor4D> => {
     const jpegData = Buffer.from(rawImageString, 'base64');
