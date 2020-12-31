@@ -9,10 +9,12 @@ https://www.kaggle.com/alxmamaev/flowers-recognition
 
 To build:
 ```
-// set up your signing keystore if building for production
 npm install
+
+// set up your signing keystore if building for production
 
 // debug build
 npm run android
 // production build
 npm run android-release
+```
