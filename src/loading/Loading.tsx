@@ -38,6 +38,11 @@ const LoadingPage = (props: LoadingPageProps) => {
 
   useEffect(() => {
     const init = async () => {
+      if (
+        (await Permissions.getAsync(Permissions.CAMERA)).status === 'granted'
+      ) {
+        setCameraPermission(true);
+      }
       await tf.ready();
       setTFReady(true);
     };
@@ -61,7 +66,7 @@ const LoadingPage = (props: LoadingPageProps) => {
   }, [TFReady]);
 
   return (
-    <View style={styles.container}>
+    <>
       {/* eslint-disable-next-line react/style-prop-object */}
       <StatusBar style="auto" />
       {TFReady ? (
@@ -99,7 +104,7 @@ const LoadingPage = (props: LoadingPageProps) => {
                 </View>
               </TouchableOpacity>
             ) : (
-              <TouchableWithoutFeedback onPress={() => { }}>
+              <TouchableWithoutFeedback onPress={() => {}}>
                 <View style={styles.permsButton}>
                   <Text>Please wait...</Text>
                 </View>
@@ -133,7 +138,7 @@ const LoadingPage = (props: LoadingPageProps) => {
           </View>
         </View>
       )}
-    </View>
+    </>
   );
 };
 
