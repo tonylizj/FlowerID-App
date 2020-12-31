@@ -51,7 +51,6 @@ const PredictionPage = (props: PredictionPageProps) => {
 
   const getPrediction = async (imageBase64: string): Promise<void> => {
     const classes = ['Daisy', 'Dandelion', 'Rose', 'Sunflower', 'Tulip'];
-    console.log(imageBase64);
     const imageTensor = await imageToTensor(imageBase64);
     if (model !== undefined) {
       const pred = model.predict(imageTensor) as tf.Tensor;
